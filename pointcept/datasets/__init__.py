@@ -20,3 +20,6 @@ from .shapenet_part import ShapeNetPartDataset
 
 # dataloader
 from .dataloader import MultiDatasetDataloader
+
+# tgnet
+from .tgnet import TgnetDataset
