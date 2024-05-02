@@ -83,9 +83,11 @@ class TgnetDataset(Dataset):
         normal = data["normal"]
         if "labels" in data.keys():
             segment = data["labels"].reshape([-1])
+            offset_vector = data['offset']
+            # print('get offset vector',offset_vector.shape)
         else:
             segment = np.ones(coord.shape[0]) * -1
-        data_dict = dict(coord=coord, normal=normal, segment=segment)
+        data_dict = dict(coord=coord, normal=normal, segment=segment, offset_vector=offset_vector)
         return data_dict
 
     def get_data_name(self, idx):
@@ -96,6 +98,9 @@ class TgnetDataset(Dataset):
         data_dict = self.get_data(idx)
         data_dict = self.transform(data_dict)
         # print('train',type(data_dict))
+        # print('here offset:',data_dict.keys())
+        # for key in data_dict:
+        #     print(key,data_dict[key].shape,data_dict[key])
         return data_dict
 
     def prepare_test_data(self, idx):

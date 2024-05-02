@@ -36,7 +36,7 @@ class CrossEntropyLoss(nn.Module):
         )
 
     def forward(self, pred, target):
-        print('here',pred.shape, target.shape)
+        print('predsize',pred.shape, 'gtsize',target.shape)
         return self.loss(pred, target) * self.loss_weight
 
 

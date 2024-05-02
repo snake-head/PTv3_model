@@ -30,6 +30,8 @@ from pointcept.utils.scheduler import build_scheduler
 from pointcept.utils.events import EventStorage
 from pointcept.utils.registry import Registry
 
+from pointcept.models.ptv3_tgnet import PTv3Tgnet
+
 
 TRAINERS = Registry("trainers")
 
@@ -130,7 +132,8 @@ class Trainer(TrainerBase):
         self.logger.info(f"Save path: {cfg.save_path}")
         self.logger.info(f"Config:\n{cfg.pretty_text}")
         self.logger.info("=> Building model ...")
-        self.model = self.build_model()
+        # self.model = self.build_model()
+        self.model = self.build_tgnet_model()
         self.logger.info("=> Building writer ...")
         self.writer = self.build_writer()
         self.logger.info("=> Building train dataset & dataloader ...")
@@ -142,6 +145,7 @@ class Trainer(TrainerBase):
         self.scheduler = self.build_scheduler()
         self.scaler = self.build_scaler()
         self.logger.info("=> Building hooks ...")
+        self.logger.info(self.cfg.hooks)
         self.register_hooks(self.cfg.hooks)
 
     def train(self):
@@ -180,7 +184,7 @@ class Trainer(TrainerBase):
                 input_dict[key] = input_dict[key].cuda(non_blocking=True)
         with torch.cuda.amp.autocast(enabled=self.cfg.enable_amp):
             output_dict = self.model(input_dict)
-            loss = output_dict["loss"]
+            loss = output_dict["loss_seg"]+ output_dict["loss_offset"]
         self.optimizer.zero_grad()
         if self.cfg.enable_amp:
             self.scaler.scale(loss).backward()
@@ -283,6 +287,11 @@ class Trainer(TrainerBase):
     def build_scaler(self):
         scaler = torch.cuda.amp.GradScaler() if self.cfg.enable_amp else None
         return scaler
+    
+    # 以下是自定义部分
+    def build_tgnet_model(self):
+        model = PTv3Tgnet(cfg=self.cfg, logger=self.logger)
+        return model
 
 
 @TRAINERS.register_module("MultiDatasetTrainer")
