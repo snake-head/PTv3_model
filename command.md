@@ -112,12 +112,23 @@ sh scripts/test.sh -p python -g 1 -d tgnet -n semseg-pt-v3m1-0-base -w model_bes
         - 得到质心和每个牙齿
         - 将聚类的分割结果覆盖在seg_logits上，此时得到seg2
         - 对于每个牙齿的单位空间，输入第二个模块
+        - 为了后续的处理，这里制作的单牙point需要包含多个属性
+          - coord (bn,3)
+          - grid_coord (bn,3)
+          - segment (bn,)
+          - offset (b,)
+          - feat (bn,64)
+          - chosed_mask (bn,)
+          - label (bn,)
+          - mask_target (bn,)
+          - mask_seg_logits (bn,)
 
 
 #### 第二模块
-
+- 这个backbone和前面的不一样，因为输入feat是64维
 - head
   - mask
+  - 这里的mask指该单位空间中，属于该牙齿的点，而不是该空间中，属于牙齿的点，以此优化聚类的结果
   - 对于该mask中True的点，赋予他们同一label，False赋予label 0
   - 此时得到seg3，也是最终结果
 

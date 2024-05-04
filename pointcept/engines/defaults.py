@@ -30,12 +30,13 @@ def create_ddp_model(model, *, fp16_compression=False, **kwargs):
     """
     if comm.get_world_size() == 1:
         return model
-    # kwargs['find_unused_parameters'] = True
+    kwargs['find_unused_parameters'] = True
     if "device_ids" not in kwargs:
         kwargs["device_ids"] = [comm.get_local_rank()]
         if "output_device" not in kwargs:
             kwargs["output_device"] = [comm.get_local_rank()]
     ddp = DistributedDataParallel(model, **kwargs)
+    # ddp.find_unused_parameters = True  
     if fp16_compression:
         from torch.distributed.algorithms.ddp_comm_hooks import default as comm_hooks
 

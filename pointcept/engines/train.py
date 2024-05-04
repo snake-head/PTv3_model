@@ -185,6 +185,9 @@ class Trainer(TrainerBase):
         with torch.cuda.amp.autocast(enabled=self.cfg.enable_amp):
             output_dict = self.model(input_dict)
             loss = output_dict["loss_seg"]+ output_dict["loss_offset"]
+            # loss = output_dict["loss_seg"]+ output_dict["loss_offset"]+output_dict['loss_dir']
+            if 'loss_mask' in output_dict:
+                loss += output_dict['loss_mask']
         self.optimizer.zero_grad()
         if self.cfg.enable_amp:
             self.scaler.scale(loss).backward()

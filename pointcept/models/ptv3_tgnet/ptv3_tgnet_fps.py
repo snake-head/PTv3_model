@@ -519,7 +519,7 @@ class Embedding(PointModule):
 
 
 @MODELS.register_module("PT-v3m1-tgnet")
-class PTV3Tgnet(PointModule):
+class PTV3TgnetBackBone(PointModule):
     def __init__(
         self,
         in_channels=6,
@@ -719,7 +719,7 @@ class PTV3Tgnet(PointModule):
 
 
 # 以下为自建模块
-@MODELS.register_module("PT-v3m1-tgnet-fps")
+@MODELS.register_module("PT-v3m1-tgnet-fps-and-bdl")
 class PTv3Tgnet(PointModule):
     def __init__(self, cfg=None, logger=None):
         super().__init__()
@@ -728,10 +728,13 @@ class PTv3Tgnet(PointModule):
         # print('kwargs',kwargs)
         self.cfg = cfg
         self.logger = logger
-        self.first_module = self.build_model()
-        self.second_module = self.build_model()
+        # 把logger塞进cfg 传给后面的模块使用
+        self.cfg.model['logger'] = self.logger
+        self.fps_module = self.build_model()
+        # build bdl之前记得改cfg的类名
+        # self.second_module = self.build_model()
         print('build成功')
-        self.logger.info(f"模块结构: {self.first_module}")
+        self.logger.info(f"模块结构: {self.fps_module}")
         # print('模块结构：',self.first_module)
         
     def build_model(self):
@@ -749,5 +752,5 @@ class PTv3Tgnet(PointModule):
         return model
     
     def forward(self, data_dict):
-        output = self.first_module(data_dict)
+        output = self.fps_module(data_dict)
         return output

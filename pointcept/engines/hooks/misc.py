@@ -243,6 +243,7 @@ class CheckpointLoader(HookBase):
                 )
                 self.trainer.start_epoch = checkpoint["epoch"]
                 self.trainer.best_metric_value = checkpoint["best_metric_value"]
+                # todo 是不是注释掉就可以忽略optimizer的参数了
                 self.trainer.optimizer.load_state_dict(checkpoint["optimizer"])
                 self.trainer.scheduler.load_state_dict(checkpoint["scheduler"])
                 if self.trainer.cfg.enable_amp:
