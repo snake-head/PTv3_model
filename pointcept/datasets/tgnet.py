@@ -29,6 +29,7 @@ class TgnetDataset(Dataset):
         test_cfg=None,
         loop=1,
         ignore_index=-1,
+        infer_mode=False,
     ):
         print('hhhhhhhhhhh')
         super(TgnetDataset, self).__init__()
@@ -39,6 +40,7 @@ class TgnetDataset(Dataset):
             loop if not test_mode else 1
         )  # force make loop = 1 while in test mode
         self.test_mode = test_mode
+        self.infer_mode = infer_mode
         self.test_cfg = test_cfg if test_mode else None
 
         if test_mode:
@@ -131,7 +133,7 @@ class TgnetDataset(Dataset):
             result_dict["inverse"] = data_dict.pop("inverse")
 
         data_dict_list = []
-        if self.aug_transform is not None:
+        if self.aug_transform is not None and self.aug_transform != []:
             for aug in self.aug_transform:
                 data_dict_list.append(aug(deepcopy(data_dict)))
         else:
@@ -155,8 +157,53 @@ class TgnetDataset(Dataset):
             fragment_list[i] = self.post_transform(fragment_list[i])
         result_dict["fragment_list"] = fragment_list
         return result_dict
+    
+    
+    def prepare_infer_data(self, idx):
+        # load data
+        data_dict = self.get_data(idx)
+        data_dict = self.transform(data_dict)
+        # print(type(data_dict))
+        # print('herehere:',data_dict.pop("segment"))
+        # print(idx)
+        # print('name',self.get_data_name(idx))
+        result_dict = dict(
+            name=self.get_data_name(idx),
+            coord=data_dict['coord'],
+            id = data_dict['id'],
+            jaw = data_dict['jaw']
+        )
+        if "origin_segment" in data_dict:
+            assert "inverse" in data_dict
+            result_dict["origin_segment"] = data_dict.pop("origin_segment")
+            result_dict["inverse"] = data_dict.pop("inverse")
 
+        data_dict_list = []
+
+        data_dict_list.append(deepcopy(data_dict))
+
+        fragment_list = []
+        for data in data_dict_list:
+            if self.test_voxelize is not None:
+                data_part_list = self.test_voxelize(data)
+            else:
+                data["index"] = np.arange(data["coord"].shape[0])
+                data_part_list = [data]
+            for data_part in data_part_list:
+                data_part = [data_part]
+                fragment_list += data_part
+                break
+            break
+
+        for i in range(len(fragment_list)):
+            fragment_list[i] = self.post_transform(fragment_list[i])
+        result_dict["fragment_list"] = fragment_list
+        return result_dict
+    
+    
     def __getitem__(self, idx):
+        if self.infer_mode:
+            return self.prepare_infer_data(idx)
         if self.test_mode:
             return self.prepare_test_data(idx)
         else:

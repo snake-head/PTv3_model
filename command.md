@@ -52,6 +52,14 @@ sh scripts/train.sh -p python -g 4 -d tgnet -c semseg-pt-v3m1-0-tgnet-fps-full-t
 sh scripts/train.sh -p python -g 4 -d tgnet -c semseg-pt-v3m1-0-tgnet-fps-full-tester -n semseg-pt-v3m1-0-tgnet-fps-full-tester
 ```
 
+
+## 训练tgnet-full-refined
+训练完善的fps模型
+
+```sh
+sh scripts/train.sh -p python -g 4 -d tgnet -c semseg-pt-v3m1-0-tgnet-fps-full-refined -n semseg-pt-v3m1-0-tgnet-fps-full-refined
+```
+
 ## 恢复训练
 
 ```sh
@@ -76,8 +84,12 @@ sh scripts/test.sh -p python -g 1 -d tgnet -n semseg-pt-v3m1-0-tgnet-fps-full-te
 sh scripts/test.sh -p python -g 1 -d tgnet -n semseg-pt-v3m1-0-tgnet-fps-full-tester -w model_best
 
 ```
+## 推理
+```sh
+sh scripts/infer.sh -p ${INTERPRETER_PATH} -g ${NUM_GPU} -d ${DATASET_NAME} -n ${EXP_NAME} -w ${CHECKPOINT_NAME}
+sh scripts/infer.sh -p python -g 1 -d tgnet -n semseg-pt-v3m1-0-tgnet-fps-full-test -w model_best
 
-
+```
 
 # 设计网络
 

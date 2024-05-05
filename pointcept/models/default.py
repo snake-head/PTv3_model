@@ -147,7 +147,7 @@ class TgnetSegmentor(nn.Module):
         self.second_module = build_model(backbone)
         self.criteria = build_criteria(criteria)
         self.criteria_offset = nn.MSELoss(size_average=True)
-        self.criteria_dir = nn.CosineSimilarity(dim=1, eps=1e-6) 
+        self.criteria_dir = nn.CosineSimilarity(dim=1, eps=1e-2) 
         self.criteria_mask = F.binary_cross_entropy_with_logits
         self.logger.info(f"tgnetsegmentor build完毕")
         # print('tgnetsegmentor build完毕')
@@ -571,12 +571,15 @@ class TgnetSegmentor(nn.Module):
         for tooth_batch in range(len(tooth_batch_offset)):
             # 取出该牙认为的label
             label = label_type[tooth_batch]
+            # todo 测试mask
+            label = 0
             refined_class = torch.zeros(17).to(seg_logits.dtype).cuda()
-            # print('refinedclass',refined_class, label)
             refined_class[label] = 10
             
             # 取出该牙的mask logits
-            mask_logits_cropped = (mask_logits[tooth_batch_mask == tooth_batch] > 0).squeeze()
+            # todo 测试mask
+            # mask_logits_cropped = (mask_logits[tooth_batch_mask == tooth_batch] > 0).squeeze()
+            mask_logits_cropped = (mask_logits[tooth_batch_mask == tooth_batch] < 0).squeeze()
             
             # 更新mask_segment_logits
             # print(mask_all_to_crop[tooth_batch].shape)
@@ -634,7 +637,9 @@ class TgnetSegmentor(nn.Module):
                             'feat': feat[mask_all_to_crop],
                             'mask_all_to_crop': mask_all_to_crop.unsqueeze(0),
                             'label': torch.tensor([label]),
-                            'mask_target': (segment[mask_all_to_crop] == label),
+                            # todo 测试两种mask
+                            # 'mask_target': (segment[mask_all_to_crop] == label),
+                            'mask_target': (segment[mask_all_to_crop] != 0),
                         })
                     else:
                         # 长度不定，用dim=0
@@ -647,7 +652,9 @@ class TgnetSegmentor(nn.Module):
                             'feat': torch.cat((single_tooth_point['feat'], feat[mask_all_to_crop]), dim=0),
                             'mask_all_to_crop': torch.cat((single_tooth_point['mask_all_to_crop'], mask_all_to_crop.unsqueeze(0)), dim=0),
                             'label': torch.cat((single_tooth_point['label'], torch.tensor([label])), dim=0),
-                            'mask_target': torch.cat((single_tooth_point['mask_target'], (segment[mask_all_to_crop] == label)), dim=0), 
+                            # todo 测试两种mask
+                            # 'mask_target': torch.cat((single_tooth_point['mask_target'], (segment[mask_all_to_crop] == label)), dim=0), 
+                            'mask_target': torch.cat((single_tooth_point['mask_target'], (segment[mask_all_to_crop] != 0)), dim=0), 
                         })
             
             if not bool(single_tooth_point.keys()): 
@@ -727,7 +734,7 @@ class TgnetSegmentor(nn.Module):
             segment_b = segment[batch_mask == b].cpu().detach().numpy()
             # 计算聚类
             clustering = DBSCAN(eps=2, min_samples=100).fit(moved_coord_b)
-            self.logger.info(f'clust on ,{b},聚类数,{len(set(clustering.labels_)) - 1},应有,{len(set(segment_b))},点数,{np.count_nonzero(clustering.labels_ != -1)},应有,{np.count_nonzero(segment_b)}')
+            self.logger.info(f'clust on ,{b},聚类数,{len(set(clustering.labels_))},应有,{len(set(segment_b))},点数,{np.count_nonzero(clustering.labels_ != -1)},应有,{np.count_nonzero(segment_b)}')
             # 对于每个聚类
             for cls in range(len(set(clustering.labels_)) - 1):
                 cls_mask = (clustering.labels_ == cls)

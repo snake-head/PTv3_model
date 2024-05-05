@@ -751,26 +751,29 @@ class PTv3Tgnet(PointModule):
             broadcast_buffers=False,
             find_unused_parameters=self.cfg.find_unused_parameters,
         )
-        if os.path.isfile(self.cfg.weight):
-            self.logger.info(f"Loading weight at: {self.cfg.weight}")
-            checkpoint = torch.load(self.cfg.weight)
-            weight = OrderedDict()
-            for key, value in checkpoint["state_dict"].items():
-                if key.startswith(module_name+".module."):
-                    if comm.get_world_size() == 1:
-                        key = key[8+len(module_name):]  # module.xxx.xxx -> xxx.xxx
-                else:
-                    if comm.get_world_size() > 1:
-                        key = module_name+".module." + key  # xxx.xxx -> module.xxx.xxx
-                weight[key] = value
-            model.load_state_dict(weight, strict=True)
-            self.logger.info(
-                "=> Loaded weight '{}' (epoch {})".format(
-                    self.cfg.weight, checkpoint["epoch"]
+        if self.cfg.weight is not None:
+            if os.path.isfile(self.cfg.weight):
+                self.logger.info(f"Loading weight at: {self.cfg.weight}")
+                checkpoint = torch.load(self.cfg.weight)
+                weight = OrderedDict()
+                for key, value in checkpoint["state_dict"].items():
+                    if key.startswith(module_name+".module."):
+                        if comm.get_world_size() == 1:
+                            key = key[8+len(module_name):]  # module.xxx.xxx -> xxx.xxx
+                    else:
+                        if comm.get_world_size() > 1:
+                            key = module_name+".module." + key  # xxx.xxx -> module.xxx.xxx
+                    weight[key] = value
+                model.load_state_dict(weight, strict=True)
+                self.logger.info(
+                    "=> Loaded weight '{}' (epoch {})".format(
+                        self.cfg.weight, checkpoint["epoch"]
+                    )
                 )
-            )
+            else:
+                raise RuntimeError("=> No checkpoint found at '{}'".format(self.cfg.weight))
         else:
-            raise RuntimeError("=> No checkpoint found at '{}'".format(self.cfg.weight))
+            self.logger.info(f"No weight, Creating New Model...")
         return model
     
     def forward(self, data_dict):

@@ -340,7 +340,102 @@ class SemSegTester(TesterBase):
     @staticmethod
     def collate_fn(batch):
         return batch
+@TESTERS.register_module()
+class TgnetInferer(TesterBase):
+    def infer(self):
+        assert self.test_loader.batch_size == 1
+        logger = get_root_logger()
+        logger.info(">>>>>>>>>>>>>>>> Start Inferring >>>>>>>>>>>>>>>>")
 
+        batch_time = AverageMeter()
+        intersection_meter = AverageMeter()
+        union_meter = AverageMeter()
+        target_meter = AverageMeter()
+        self.model.eval()
+
+        save_path = os.path.join(self.cfg.save_path, "result_infer")
+        make_dirs(save_path)
+
+        comm.synchronize()
+        record = {}
+        # fragment inference
+        for idx, data_dict in enumerate(self.test_loader):
+            end = time.time()
+            data_dict = data_dict[0]  # current assume batch size is 1
+            print(data_dict.keys())
+            fragment_list = data_dict.pop("fragment_list")
+            # segment = data_dict.pop("segment")
+            data_name = data_dict.pop("name")
+            pred_save_path = os.path.join(save_path, "{}_pred.npy".format(data_name))
+            if os.path.isfile(pred_save_path):
+                logger.info(
+                    "{}/{}: {}, loaded pred and label.".format(
+                        idx + 1, len(self.test_loader), data_name
+                    )
+                )
+                pred = np.load(pred_save_path)
+            else:
+                print(data_dict.keys())
+                pred = torch.zeros((data_dict['coord'].shape[0], self.cfg.data.num_classes)).cuda()
+                for i in range(len(fragment_list)):
+                    fragment_batch_size = 1
+                    s_i, e_i = i * fragment_batch_size, min(
+                        (i + 1) * fragment_batch_size, len(fragment_list)
+                    )
+                    input_dict = collate_fn(fragment_list[s_i:e_i])
+                    for key in input_dict.keys():
+                        if isinstance(input_dict[key], torch.Tensor):
+                            input_dict[key] = input_dict[key].cuda(non_blocking=True)
+                    idx_part = input_dict["index"]
+                    with torch.no_grad():
+                        pred_part = self.model(input_dict)["seg_logits"]  # (n, k)
+                        pred_part = F.softmax(pred_part, -1)
+                        if self.cfg.empty_cache:
+                            torch.cuda.empty_cache()
+                        bs = 0
+                        for be in input_dict["offset"]:
+                            pred[idx_part[bs:be], :] += pred_part[bs:be]
+                            bs = be
+
+                    logger.info(
+                        "Test: {}/{}-{data_name}, Batch: {batch_idx}/{batch_num}".format(
+                            idx + 1,
+                            len(self.test_loader),
+                            data_name=data_name,
+                            batch_idx=i,
+                            batch_num=len(fragment_list),
+                        )
+                    )
+                pred = pred.max(1)[1].data.cpu().numpy()
+                np.save(pred_save_path, pred)
+                
+
+            batch_time.update(time.time() - end)
+            logger.info(
+                "Test: {} [{}/{}]-{} "
+                "Batch {batch_time.val:.3f} ({batch_time.avg:.3f}) "
+                
+                .format(
+                    data_name,
+                    idx + 1,
+                    len(self.test_loader),
+                    data_dict['coord'].shape[0],
+                    batch_time=batch_time,
+                )
+            )
+            
+
+        logger.info("Syncing ...")
+        comm.synchronize()
+        record_sync = comm.gather(record, dst=0)
+
+        if comm.is_main_process():
+ 
+            logger.info("<<<<<<<<<<<<<<<<< End Evaluation <<<<<<<<<<<<<<<<<")
+
+    @staticmethod
+    def collate_fn(batch):
+        return batch
 
 @TESTERS.register_module()
 class ClsTester(TesterBase):
