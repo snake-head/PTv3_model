@@ -53,8 +53,9 @@ class TgnetDataset(Dataset):
                 else None
             )
             self.post_transform = Compose(self.test_cfg.post_transform)
-            self.aug_transform = [Compose(aug) for aug in self.test_cfg.aug_transform]
-
+            # self.aug_transform = [Compose(aug) for aug in self.test_cfg.aug_transform]
+            self.aug_transform = None
+            
         self.data_list = self.get_data_list()
         print('eeeee',self.data_list)
         logger = get_root_logger()
@@ -78,16 +79,26 @@ class TgnetDataset(Dataset):
 
     def get_data(self, idx):
         data = torch.load(self.data_list[idx % len(self.data_list)])
+        fileName = self.data_list[idx % len(self.data_list)].split('/')[-1]
+        if not 'id' in data.keys():
+            id = fileName.split('_')[0]
+        else:
+            id = data[id]
+        if not 'jaw' in data.keys():
+            jaw = fileName.split('.')[0].split('_')[-1]
+        else:
+            jaw = data['jaw']
         coord = data["coord"]
         # color = data["color"]
         normal = data["normal"]
+        # todo 去掉offset vector
         if "labels" in data.keys():
             segment = data["labels"].reshape([-1])
             offset_vector = data['offset']
             # print('get offset vector',offset_vector.shape)
         else:
             segment = np.ones(coord.shape[0]) * -1
-        data_dict = dict(coord=coord, normal=normal, segment=segment, offset_vector=offset_vector)
+        data_dict = dict(coord=coord, normal=normal, segment=segment, id=id, jaw=jaw, offset_vector=offset_vector)
         return data_dict
 
     def get_data_name(self, idx):
@@ -120,8 +131,11 @@ class TgnetDataset(Dataset):
             result_dict["inverse"] = data_dict.pop("inverse")
 
         data_dict_list = []
-        for aug in self.aug_transform:
-            data_dict_list.append(aug(deepcopy(data_dict)))
+        if self.aug_transform is not None:
+            for aug in self.aug_transform:
+                data_dict_list.append(aug(deepcopy(data_dict)))
+        else:
+            data_dict_list.append(deepcopy(data_dict))
 
         fragment_list = []
         for data in data_dict_list:

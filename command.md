@@ -34,11 +34,23 @@ sh scripts/train.sh -p python -g 4 -d tgnet -c semseg-pt-v3m1-0-tgnet-fps-simple
 
 
 ## 训练tgnet-full
-
+完成fps的训练
 ```sh
 sh scripts/train.sh -p python -g 4 -d tgnet -c semseg-pt-v3m1-0-tgnet-fps-full -n semseg-pt-v3m1-0-tgnet-fps-full
 ```
 
+## 训练tgnet-full-test
+在这里优化模型的代码，区分train val test的pipeline并完善评估
+
+```sh
+sh scripts/train.sh -p python -g 4 -d tgnet -c semseg-pt-v3m1-0-tgnet-fps-full-test -n semseg-pt-v3m1-0-tgnet-fps-full-test
+```
+## 训练tgnet-full-tester
+调试tester
+
+```sh
+sh scripts/train.sh -p python -g 4 -d tgnet -c semseg-pt-v3m1-0-tgnet-fps-full-tester -n semseg-pt-v3m1-0-tgnet-fps-full-tester
+```
 
 ## 恢复训练
 
@@ -58,6 +70,11 @@ python tools/train.py --config-file ${CONFIG_PATH} --num-gpus ${NUM_GPU} --optio
 sh scripts/test.sh -p ${INTERPRETER_PATH} -g ${NUM_GPU} -d ${DATASET_NAME} -n ${EXP_NAME} -w ${CHECKPOINT_NAME}
     
 sh scripts/test.sh -p python -g 1 -d tgnet -n semseg-pt-v3m1-0-base -w model_best
+
+sh scripts/test.sh -p python -g 1 -d tgnet -n semseg-pt-v3m1-0-tgnet-fps-full-test -w model_best
+
+sh scripts/test.sh -p python -g 1 -d tgnet -n semseg-pt-v3m1-0-tgnet-fps-full-tester -w model_best
+
 ```
 
 
@@ -111,6 +128,7 @@ sh scripts/test.sh -p python -g 1 -d tgnet -n semseg-pt-v3m1-0-base -w model_bes
 
         - 得到质心和每个牙齿
         - 将聚类的分割结果覆盖在seg_logits上，此时得到seg2
+          - 注意logits是未softmax的，改的数值差别要尽可能大，如0和10
         - 对于每个牙齿的单位空间，输入第二个模块
         - 为了后续的处理，这里制作的单牙point需要包含多个属性
           - coord (bn,3)
@@ -130,7 +148,9 @@ sh scripts/test.sh -p python -g 1 -d tgnet -n semseg-pt-v3m1-0-base -w model_bes
   - mask
   - 这里的mask指该单位空间中，属于该牙齿的点，而不是该空间中，属于牙齿的点，以此优化聚类的结果
   - 对于该mask中True的点，赋予他们同一label，False赋予label 0
+    - 注意logits是未sigmoid的，要输出大于0认定true
   - 此时得到seg3，也是最终结果
+    - 注意logits是未softmax的，改的数值差别要尽可能大，如0和10
 
 
 

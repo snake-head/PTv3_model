@@ -120,6 +120,8 @@ class TgnetEvaluatorFPS(HookBase):
             loss_seg = output_dict["loss_seg"]
             loss_offset = output_dict['loss_offset']
             loss_dir = output_dict['loss_dir']
+            if 'loss_mask' in output_dict:
+                loss_mask = output_dict['loss_mask']
             pred = output_seg.max(1)[1]
             segment = input_dict["segment"]
             offset_vector = input_dict['offset_vector']
@@ -152,33 +154,45 @@ class TgnetEvaluatorFPS(HookBase):
             self.trainer.storage.put_scalar("val_intersection", intersection)
             self.trainer.storage.put_scalar("val_union", union)
             self.trainer.storage.put_scalar("val_target", target)
-            self.trainer.storage.put_scalar("val_loss_seg", loss_seg.item())
-            self.trainer.storage.put_scalar("val_loss_offset", loss_offset.item())
-            self.trainer.storage.put_scalar("val_loss_dir", loss_dir.item())
+            for key in output_dict.keys():
+                if key.startswith('loss'):
+                    self.trainer.storage.put_scalar("val_"+key, output_dict[key].item())
+            # self.trainer.storage.put_scalar("val_loss_seg", loss_seg.item())
+            # self.trainer.storage.put_scalar("val_loss_offset", loss_offset.item())
+            # self.trainer.storage.put_scalar("val_loss_dir", loss_dir.item())
+            # if 'loss_mask' in output_dict:
+            #     self.trainer.storage.put_scalar("val_loss_mask", loss_mask.item())
             info = "Test: [{iter}/{max_iter}] ".format(
                 iter=i + 1, max_iter=len(self.trainer.val_loader)
             )
             if "origin_coord" in input_dict.keys():
                 info = "Interp. " + info
-            self.trainer.logger.info(
-                info
-                + "Loss seg {loss:.4f} ".format(
-                    iter=i + 1, max_iter=len(self.trainer.val_loader), loss=loss_seg.item()
+            info = (info                 
+                    + "Loss seg {loss:.4f} ".format(
+                        iter=i + 1, max_iter=len(self.trainer.val_loader), loss=loss_seg.item()
+                    )
+                    + "Loss offset {loss:.4f} ".format(
+                        iter=i + 1, max_iter=len(self.trainer.val_loader), loss=loss_offset.item()
+                    )
+                    + "Loss dir {loss:.4f} ".format(
+                        iter=i + 1, max_iter=len(self.trainer.val_loader), loss=loss_dir.item()
+                    )
                 )
-                + "Loss offset {loss:.4f} ".format(
-                    iter=i + 1, max_iter=len(self.trainer.val_loader), loss=loss_offset.item()
-                )
-                + "Loss dir {loss:.4f} ".format(
-                    iter=i + 1, max_iter=len(self.trainer.val_loader), loss=loss_dir.item()
-                )
-            )
+            if 'loss_mask' in output_dict:
+                info = (info + "Loss mask {loss:.4f} ".format(
+                    iter=i + 1, max_iter=len(self.trainer.val_loader), loss=loss_mask.item()
+                    ))
+            self.trainer.logger.info(info)
 
         loss_avg = self.trainer.storage.history("val_loss_seg").avg
         intersection = self.trainer.storage.history("val_intersection").total
         union = self.trainer.storage.history("val_union").total
         target = self.trainer.storage.history("val_target").total
+            
         loss_offset = self.trainer.storage.history("val_loss_offset").avg
         loss_dir = self.trainer.storage.history("val_loss_dir").avg
+        if 'loss_mask' in output_dict:
+            loss_mask = self.trainer.storage.history("val_loss_mask").avg
         iou_class = intersection / (union + 1e-10)
         acc_class = intersection / (target + 1e-10)
         m_iou = np.mean(iou_class)
@@ -204,8 +218,14 @@ class TgnetEvaluatorFPS(HookBase):
             self.trainer.writer.add_scalar("val/mIoU", m_iou, current_epoch)
             self.trainer.writer.add_scalar("val/mAcc", m_acc, current_epoch)
             self.trainer.writer.add_scalar("val/allAcc", all_acc, current_epoch)
-            self.trainer.writer.add_scalar("val/loss_offset", loss_offset, current_epoch)
-            self.trainer.writer.add_scalar("val/loss_dir", loss_dir, current_epoch)
+            for key in output_dict.keys():
+                if key.startswith('loss'):
+                    loss = self.trainer.storage.history("val_"+key).avg
+                    self.trainer.writer.add_scalar("val/"+key, loss, current_epoch)
+            # self.trainer.writer.add_scalar("val/loss_offset", loss_offset, current_epoch)
+            # self.trainer.writer.add_scalar("val/loss_dir", loss_dir, current_epoch)
+            # if 'loss_mask' in output_dict:
+            #     self.trainer.writer.add_scalar("val/loss_mask", loss_mask, current_epoch)
         self.trainer.logger.info("<<<<<<<<<<<<<<<<< End Tgnet FPS Evaluation <<<<<<<<<<<<<<<<<")
         self.trainer.comm_info["current_metric_value"] = m_iou  # save for saver
         self.trainer.comm_info["current_metric_name"] = "mIoU"  # save for saver

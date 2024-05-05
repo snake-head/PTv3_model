@@ -26,7 +26,7 @@ from pointcept.utils.misc import (
     intersection_and_union_gpu,
     make_dirs,
 )
-
+from pointcept.models.ptv3_tgnet import PTv3Tgnet
 
 TESTERS = Registry("testers")
 
@@ -46,7 +46,8 @@ class TesterBase:
             self.logger.info(f"Config:\n{cfg.pretty_text}")
         if model is None:
             self.logger.info("=> Building model ...")
-            self.model = self.build_model()
+            # self.model = self.build_model()
+            self.model = self.build_tgnet_model()
         else:
             self.model = model
         if test_loader is None:
@@ -109,6 +110,12 @@ class TesterBase:
     @staticmethod
     def collate_fn(batch):
         raise collate_fn(batch)
+
+    # 以下是自定义部分
+    def build_tgnet_model(self):
+        model = PTv3Tgnet(cfg=self.cfg, logger=self.logger)
+        return model
+
 
 
 @TESTERS.register_module()

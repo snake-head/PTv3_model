@@ -28,7 +28,9 @@ from pointcept.models.modules import PointModule, PointSequential
 # 以下自定义导入
 from pointcept.models import build_model
 from pointcept.engines.defaults import create_ddp_model, worker_init_fn
-
+import os
+from collections import OrderedDict
+import pointcept.utils.comm as comm
 class RPE(torch.nn.Module):
     def __init__(self, patch_size, num_heads):
         super().__init__()
@@ -730,14 +732,14 @@ class PTv3Tgnet(PointModule):
         self.logger = logger
         # 把logger塞进cfg 传给后面的模块使用
         self.cfg.model['logger'] = self.logger
-        self.fps_module = self.build_model()
+        self.fps_module = self.build_model(module_name='fps_module')
         # build bdl之前记得改cfg的类名
         # self.second_module = self.build_model()
         print('build成功')
         self.logger.info(f"模块结构: {self.fps_module}")
         # print('模块结构：',self.first_module)
         
-    def build_model(self):
+    def build_model(self, module_name):
         model = build_model(self.cfg.model)
         if self.cfg.sync_bn:
             model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
@@ -749,6 +751,26 @@ class PTv3Tgnet(PointModule):
             broadcast_buffers=False,
             find_unused_parameters=self.cfg.find_unused_parameters,
         )
+        if os.path.isfile(self.cfg.weight):
+            self.logger.info(f"Loading weight at: {self.cfg.weight}")
+            checkpoint = torch.load(self.cfg.weight)
+            weight = OrderedDict()
+            for key, value in checkpoint["state_dict"].items():
+                if key.startswith(module_name+".module."):
+                    if comm.get_world_size() == 1:
+                        key = key[8+len(module_name):]  # module.xxx.xxx -> xxx.xxx
+                else:
+                    if comm.get_world_size() > 1:
+                        key = module_name+".module." + key  # xxx.xxx -> module.xxx.xxx
+                weight[key] = value
+            model.load_state_dict(weight, strict=True)
+            self.logger.info(
+                "=> Loaded weight '{}' (epoch {})".format(
+                    self.cfg.weight, checkpoint["epoch"]
+                )
+            )
+        else:
+            raise RuntimeError("=> No checkpoint found at '{}'".format(self.cfg.weight))
         return model
     
     def forward(self, data_dict):
