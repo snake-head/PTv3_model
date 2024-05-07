@@ -104,6 +104,12 @@ def default_argument_parser(epilog=None):
     parser.add_argument(
         "--options", nargs="+", action=DictAction, help="custom options"
     )
+    parser.add_argument(
+        "--inputpath",  type=str, help="input path when infer", required=False
+    )
+    parser.add_argument(
+        "--outputpath",  type=str, help="output path when infer", required=False
+    )
     return parser
 
 

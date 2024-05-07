@@ -9,6 +9,8 @@ import torch
 import numpy as np
 from collections import Counter
 import torch.nn.functional as F 
+import pointops
+from pointops import farthest_point_sampling
 
 @MODELS.register_module()
 class DefaultSegmentor(nn.Module):
@@ -143,7 +145,7 @@ class TgnetSegmentor(nn.Module):
         )
         self.first_module = build_model(backbone)
         # 第二模块的输入feat维度是64
-        backbone.in_channels = 64
+        # backbone.in_channels = 64
         self.second_module = build_model(backbone)
         self.criteria = build_criteria(criteria)
         self.criteria_offset = nn.MSELoss(size_average=True)
@@ -154,12 +156,15 @@ class TgnetSegmentor(nn.Module):
 
     def forward(self, input_dict):
         print('forward')
-        
+        # self.logger.info(f"{input_dict.keys()}")
+        # self.logger.info(f"1 {input_dict['coord'].shape[0]} {input_dict['grid_coord'].shape[0]} {input_dict['offset'].shape} {input_dict['feat'][0]} {input_dict['coord'][0]} {input_dict['normal'][0]}")
         # 预处理输入
+        # input_dict.pop('coord')
         point = Point(input_dict)
+        # self.logger.info(f"2 {point['coord'].shape[0]} {point['grid_coord'].shape[0]} {point['offset'].shape} {point['feat'][0]} {point['coord'][0]} {point['normal'][0]}")
         # 输入第一模块
         point = self.first_module(point)
-        
+        # self.logger.info(f"3 {point['coord'].shape[0]} {point['grid_coord'].shape[0]} {point['offset'].shape} {point['feat'][0]} {point['coord'][0]} {point['normal'][0]}")
         
         # 得到第一模块的seg、offset结果
         seg_logits = self.seg_head(point.feat)
@@ -188,12 +193,12 @@ class TgnetSegmentor(nn.Module):
         if self.training:
             # 训练时不用聚类，但是可以查看数据
             # single_tooth_point = self.get_single_tooth_point(point, phase='val', seg_logits=cls_segment_logits)
-            single_tooth_point = self.get_single_tooth_point(point, phase='train')     
+            single_tooth_point = self.get_single_tooth_point(point, input_dict, phase='train')     
         else:
             # todo 后续改为val
             # 先根据seg聚类
             cls_segment_logits = self.get_cluster_val(point=point, seg_logits=seg_logits, offset_logits=offset_logits)
-            single_tooth_point = self.get_single_tooth_point(point, phase='val', seg_logits=cls_segment_logits)
+            single_tooth_point = self.get_single_tooth_point(point, input_dict, phase='val', seg_logits=cls_segment_logits)
             # clustering, cls_to_label, cls_seg_logits, cls_segment_logits = self.get_cluster(point,seg_logits=seg_logits,offset_logits=offset_logits, input_dict=input_dict)
             
         # self.logger.info(f'{point}')
@@ -210,13 +215,14 @@ class TgnetSegmentor(nn.Module):
         #         all_data['segment'] = point['segment']
         #         all_data['normal'] = point['normal']
         # 输入第二模块
-        if single_tooth_point is not None and 'segment' in input_dict.keys():
-            single_tooth_point_output = self.second_module(single_tooth_point)
-            mask_logits = self.mask_head(single_tooth_point_output.feat)
-            # 计算loss_mask
-            loss_mask = self.get_loss_mask(single_tooth_point_output, mask_logits=mask_logits)
-            # 注意，目前在seg1上更新
-            mask_segment_logits = self.get_mask_segment_logits(single_tooth_point_output, seg_logits=seg_logits, mask_logits=mask_logits)
+        if single_tooth_point is not None and 'segment' in input_dict.keys() and 'coord' in single_tooth_point.keys():
+            if single_tooth_point['coord'].shape[0] > 100:
+                single_tooth_point_output = self.second_module(single_tooth_point)
+                mask_logits = self.mask_head(single_tooth_point_output.feat)
+                # 计算loss_mask
+                loss_mask = self.get_loss_mask(single_tooth_point_output, mask_logits=mask_logits)
+                # 注意，目前在seg1上更新
+                mask_segment_logits = self.get_mask_segment_logits(single_tooth_point_output, seg_logits=seg_logits, mask_logits=mask_logits)
             
             # 保存一个测试数据 
             # if point['grid_coord'].get_device() == 0:
@@ -588,7 +594,7 @@ class TgnetSegmentor(nn.Module):
         return mask_segment_logits
         
     
-    def get_single_tooth_point(self, point, phase, seg_logits=None):
+    def get_single_tooth_point(self, point, input_dict, phase, seg_logits=None):
         # todo feat是否要改
         if phase == 'train' or phase == 'val':
             segment = point.segment
@@ -597,20 +603,23 @@ class TgnetSegmentor(nn.Module):
             batch_mask = point.batch
             coord = point.coord
             grid_coord = point.grid_coord
-            feat = point.feat
+            feat = input_dict['feat']
             grid_coord = grid_coord.to(torch.float)
             single_tooth_point = {}
             # 对于每一个full
+            
             for b in range(batch_mask[-1] + 1):
                 # 找到每一个one
                 for label in range(1, 17):
+                    # self.logger.info(f'检查label {b} {label}')
                     # 取出每一颗牙
                     mask_all_to_one = (batch_mask == b) & (segment == label)
                     # 如果无该牙齿
                     if not torch.any(mask_all_to_one):
+                        # self.logger.info(f'无该牙{segment}')
                         continue
-                    center = torch.mean(grid_coord[mask_all_to_one], dim=0)
-                    offset_vector = grid_coord[mask_all_to_one] - center
+                    center = torch.mean(coord[mask_all_to_one], dim=0)
+                    offset_vector = coord[mask_all_to_one] - center
                     # print('offset_vector',offset_vector)
                     # 找到模长最大的向量所在的索引
                     norms = torch.norm(offset_vector, dim=1)
@@ -618,23 +627,37 @@ class TgnetSegmentor(nn.Module):
                     max_norm_index = torch.argmax(norms)
                     crop_distance = norms[max_norm_index] 
                     
-                    distance = torch.norm(grid_coord - center, dim=1)
+                    distance = torch.norm(coord - center, dim=1)
                     mask_all_to_crop = (distance < crop_distance * 1.1) & (batch_mask == b)
+                    if not torch.any(mask_all_to_crop):
+                        continue
                     
-                    # 取出单位牙齿
+                    # 取出单位牙齿coord
+                    coord_cropped = coord[mask_all_to_crop]
+                    coord_cropped -= center
+                    coord_cropped /= crop_distance
+                    coord_cropped *= 10
+                    
+                    # 取出单位牙齿grid_coord
                     grid_coord_cropped = grid_coord[mask_all_to_crop]
-                    grid_coord_cropped -= center
-                    grid_coord_cropped *= 10
+                    min_coord,_ = torch.min(grid_coord_cropped, dim=0)
+                    grid_coord_cropped -= min_coord
                     grid_coord_cropped = grid_coord_cropped.to(torch.long)
+                    
+
+                    # 新feat
+                    normal_cropped = input_dict['normal'][mask_all_to_crop]
+                    feat_cropped = torch.cat((coord_cropped, normal_cropped), dim=1)
                     
                     # 存入point
                     if not 'coord' in single_tooth_point:
+                        self.logger.info(f'创建单牙')
                         single_tooth_point.update({
-                            'coord': coord[mask_all_to_crop],
+                            'coord': coord_cropped,
                             'grid_coord': grid_coord_cropped,
                             'segment': segment[mask_all_to_crop],
                             'offset': torch.tensor([grid_coord_cropped.shape[0]]).cuda(),
-                            'feat': feat[mask_all_to_crop],
+                            'feat': feat_cropped,
                             'mask_all_to_crop': mask_all_to_crop.unsqueeze(0),
                             'label': torch.tensor([label]),
                             # todo 测试两种mask
@@ -645,11 +668,11 @@ class TgnetSegmentor(nn.Module):
                         # 长度不定，用dim=0
                         point_amount = single_tooth_point['offset'][-1] if len(single_tooth_point['offset']) > 1 else single_tooth_point['offset'] 
                         single_tooth_point.update({
-                            'coord': torch.cat((single_tooth_point['coord'], coord[mask_all_to_crop]), dim=0),
+                            'coord': torch.cat((single_tooth_point['coord'], coord_cropped), dim=0),
                             'grid_coord': torch.cat((single_tooth_point['grid_coord'], grid_coord_cropped), dim=0),
                             'segment': torch.cat((single_tooth_point['segment'],segment[mask_all_to_crop]), dim=0),
                             'offset': torch.cat((single_tooth_point['offset'], torch.tensor([point_amount + grid_coord_cropped.shape[0]]).cuda()), dim=0),
-                            'feat': torch.cat((single_tooth_point['feat'], feat[mask_all_to_crop]), dim=0),
+                            'feat': torch.cat((single_tooth_point['feat'], feat_cropped), dim=0),
                             'mask_all_to_crop': torch.cat((single_tooth_point['mask_all_to_crop'], mask_all_to_crop.unsqueeze(0)), dim=0),
                             'label': torch.cat((single_tooth_point['label'], torch.tensor([label])), dim=0),
                             # todo 测试两种mask
@@ -667,8 +690,14 @@ class TgnetSegmentor(nn.Module):
         # if phase == 'val':
             
         return None
-
+    
+    def fps_sample(self, input_dict):
+        idx = farthest_point_sampling(input_dict['grid_coord'], input_dict['offset'],24000)
+        self.logger.info(f"最远点采样{len(idx)} {input_dict['offset'][0]}")
         
+        
+        
+    
     def get_loss_mask(self, single_tooth_point_output, mask_logits):
         self.logger.info(f"计算loss mask")
         mask_target = single_tooth_point_output.mask_target
@@ -733,12 +762,17 @@ class TgnetSegmentor(nn.Module):
             moved_coord_b = moved_coord[batch_mask == b].cpu().detach().numpy()
             segment_b = segment[batch_mask == b].cpu().detach().numpy()
             # 计算聚类
-            clustering = DBSCAN(eps=2, min_samples=100).fit(moved_coord_b)
-            self.logger.info(f'clust on ,{b},聚类数,{len(set(clustering.labels_))},应有,{len(set(segment_b))},点数,{np.count_nonzero(clustering.labels_ != -1)},应有,{np.count_nonzero(segment_b)}')
+            if not np.any(segment_b != 0):
+                continue
+            clustering = DBSCAN(eps=2, min_samples=100).fit(moved_coord_b[segment_b != 0])
+            self.logger.info(f'clust on ,{b},聚类数,{len(set(clustering.labels_))-1},应有,{len(set(segment_b))},点数,{np.count_nonzero(clustering.labels_ != -1)},应有,{np.count_nonzero(segment_b)}')
             # 对于每个聚类
-            for cls in range(len(set(clustering.labels_)) - 1):
+            # for cls in range(len(set(clustering.labels_)) - 1):
+            for cls in np.unique(clustering.labels_):
+                if cls == -1:
+                    continue
                 cls_mask = (clustering.labels_ == cls)
-                counter = Counter(segment_b[cls_mask])  
+                counter = Counter(segment_b[segment_b != 0][cls_mask])  
                 most_common_element = counter.most_common(1)[0] 
                 
                 # 找到对应label
@@ -748,7 +782,9 @@ class TgnetSegmentor(nn.Module):
                 # 更新seg
                 refined_class = torch.zeros(17).to(cls_segment_logits.dtype).cuda()
                 refined_class[label] = 10
-                mask_all_to_cls = (batch_mask == b).masked_scatter_((batch_mask == b), torch.from_numpy(cls_mask).cuda())
+                segment_b = torch.as_tensor(segment_b).cuda()
+                mask_full_to_cls = (segment_b != 0).masked_scatter_((segment_b != 0), torch.from_numpy(cls_mask).cuda())
+                mask_all_to_cls = (batch_mask == b).masked_scatter_((batch_mask == b), (mask_full_to_cls).cuda())
                 # print(b,cls,label,batch_mask.shape)
                 # print('here',batch_mask == b,cls_mask.shape,mask_all_to_cls)
                 cls_segment_logits[mask_all_to_cls] = refined_class

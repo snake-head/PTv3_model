@@ -16,6 +16,7 @@ from collections.abc import Sequence
 from pointcept.utils.logger import get_root_logger
 from .builder import DATASETS, build_dataset
 from .transform import Compose, TRANSFORMS
+import pointops
 
 
 @DATASETS.register_module()
@@ -77,15 +78,17 @@ class TgnetDataset(Dataset):
                 data_list += glob.glob(os.path.join(self.data_root, split, "*.pth"))
         else:
             raise NotImplementedError
+        print(data_list)
         return data_list
 
     def get_data(self, idx):
         data = torch.load(self.data_list[idx % len(self.data_list)])
         fileName = self.data_list[idx % len(self.data_list)].split('/')[-1]
+        # print('fileName',fileName)
         if not 'id' in data.keys():
             id = fileName.split('_')[0]
         else:
-            id = data[id]
+            id = data['id']
         if not 'jaw' in data.keys():
             jaw = fileName.split('.')[0].split('_')[-1]
         else:
@@ -94,13 +97,18 @@ class TgnetDataset(Dataset):
         # color = data["color"]
         normal = data["normal"]
         # todo 去掉offset vector
-        if "labels" in data.keys():
+        # print('dataloader', coord.shape)
+        if "labels" in data.keys() and self.infer_mode==False:
             segment = data["labels"].reshape([-1])
-            offset_vector = data['offset']
+            
+            # offset_vector = data['offset']
             # print('get offset vector',offset_vector.shape)
         else:
             segment = np.ones(coord.shape[0]) * -1
-        data_dict = dict(coord=coord, normal=normal, segment=segment, id=id, jaw=jaw, offset_vector=offset_vector)
+        # 最远点采样
+        # if True:
+            # idx = pointops.farthest_point_sampling()
+        data_dict = dict(coord=coord, normal=normal, segment=segment, id=id, jaw=jaw)
         return data_dict
 
     def get_data_name(self, idx):
@@ -110,6 +118,7 @@ class TgnetDataset(Dataset):
         # load data
         data_dict = self.get_data(idx)
         data_dict = self.transform(data_dict)
+        
         # print('train',type(data_dict))
         # print('here offset:',data_dict.keys())
         # for key in data_dict:
@@ -163,6 +172,7 @@ class TgnetDataset(Dataset):
         # load data
         data_dict = self.get_data(idx)
         data_dict = self.transform(data_dict)
+        # print('transform后',data_dict['coord'].shape)
         # print(type(data_dict))
         # print('herehere:',data_dict.pop("segment"))
         # print(idx)
@@ -190,14 +200,17 @@ class TgnetDataset(Dataset):
                 data["index"] = np.arange(data["coord"].shape[0])
                 data_part_list = [data]
             for data_part in data_part_list:
-                data_part = [data_part]
+                if self.test_crop is not None:
+                    data_part = self.test_crop(data_part)
+                else:
+                    data_part = [data_part]
                 fragment_list += data_part
-                break
-            break
-
+                
+        # print('voxelize后',data_dict['coord'].shape, data_dict['grid_coord'].shape)
         for i in range(len(fragment_list)):
             fragment_list[i] = self.post_transform(fragment_list[i])
         result_dict["fragment_list"] = fragment_list
+        print('return前',result_dict.keys())
         return result_dict
     
     

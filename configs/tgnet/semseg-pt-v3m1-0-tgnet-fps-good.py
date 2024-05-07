@@ -1,7 +1,7 @@
 _base_ = ["../_base_/default_runtime.py"]
 
 # misc custom setting
-batch_size = 16  # bs: total bs in all gpus
+batch_size = 96  # bs: total bs in all gpus
 mix_prob = 0
 empty_cache = False
 enable_amp = True
@@ -78,7 +78,7 @@ param_dicts = [dict(keyword="block", lr=0.0002)]
 
 # dataset settings
 dataset_type = "TgnetDataset"
-data_root = "data/tgnet_fulldataset_withoffset"
+data_root = "data/tgnet_resize_dataset"
 # data_root = "data/tgnet_dataset"
 
 

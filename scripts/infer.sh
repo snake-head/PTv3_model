@@ -5,13 +5,16 @@ PYTHON=python
 
 TEST_CODE=infer.py
 
-DATASET=scannet
+DATASET=tgnet
 CONFIG="None"
 EXP_NAME=debug
 WEIGHT=model_best
 GPU=None
 
-while getopts "p:d:c:n:w:g:" opt; do
+INPUT_PATH=None
+OUTPUT_PATH=None
+
+while getopts "p:d:c:n:w:g:i:o:" opt; do
   case $opt in
     p)
       PYTHON=$OPTARG
@@ -31,6 +34,13 @@ while getopts "p:d:c:n:w:g:" opt; do
     g)
       GPU=$OPTARG
       ;;
+    i)
+      INPUT_PATH=$OPTARG
+
+      ;;
+    o)
+      OUTPUT_PATH=$OPTARG
+      ;;
     \?)
       echo "Invalid option: -$OPTARG"
       ;;
@@ -41,7 +51,9 @@ if [ "${NUM_GPU}" = 'None' ]
 then
   NUM_GPU=`$PYTHON -c 'import torch; print(torch.cuda.device_count())'`
 fi
-
+echo " =========> INFERENCE CONFIG <========="
+echo "inputpath: $INPUT_PATH"
+echo "outputpath: $OUTPUT_PATH"
 echo "Experiment name: $EXP_NAME"
 echo "Python interpreter dir: $PYTHON"
 echo "Dataset: $DATASET"
@@ -71,4 +83,6 @@ echo " =========> RUN TASK <========="
 $PYTHON -u tools/$TEST_CODE \
   --config-file "$CONFIG_DIR" \
   --num-gpus "$GPU" \
-  --options save_path="$EXP_DIR" weight="${MODEL_DIR}"/"${WEIGHT}".pth
+  --options save_path="$EXP_DIR" weight="${MODEL_DIR}"/"${WEIGHT}".pth\
+  --inputpath $INPUT_PATH\
+  --outputpath $OUTPUT_PATH

@@ -27,6 +27,7 @@ from pointcept.utils.misc import (
     make_dirs,
 )
 from pointcept.models.ptv3_tgnet import PTv3Tgnet
+import json
 
 TESTERS = Registry("testers")
 
@@ -191,8 +192,14 @@ class SemSegTester(TesterBase):
                             input_dict[key] = input_dict[key].cuda(non_blocking=True)
                     idx_part = input_dict["index"]
                     with torch.no_grad():
+                        print('test input',input_dict['coord'].shape)
                         pred_part = self.model(input_dict)["seg_logits"]  # (n, k)
                         pred_part = F.softmax(pred_part, -1)
+                        print('test pred_part', pred_part.shape)
+                        print('test', input_dict.keys())
+                        print('test', input_dict['index'].shape)
+                        print('test',max(input_dict['index']))
+                        print('test', input_dict['offset'].shape)
                         if self.cfg.empty_cache:
                             torch.cuda.empty_cache()
                         bs = 0
@@ -353,7 +360,8 @@ class TgnetInferer(TesterBase):
         target_meter = AverageMeter()
         self.model.eval()
 
-        save_path = os.path.join(self.cfg.save_path, "result_infer")
+        # save_path = os.path.join(self.cfg.save_path, "result_infer")
+        save_path = os.path.join(self.cfg.outputpath, "result_infer")
         make_dirs(save_path)
 
         comm.synchronize()
@@ -388,8 +396,10 @@ class TgnetInferer(TesterBase):
                             input_dict[key] = input_dict[key].cuda(non_blocking=True)
                     idx_part = input_dict["index"]
                     with torch.no_grad():
+                        print('input',input_dict['coord'].shape)
                         pred_part = self.model(input_dict)["seg_logits"]  # (n, k)
                         pred_part = F.softmax(pred_part, -1)
+                        print('pred_part',pred_part.shape)
                         if self.cfg.empty_cache:
                             torch.cuda.empty_cache()
                         bs = 0
@@ -408,6 +418,8 @@ class TgnetInferer(TesterBase):
                     )
                 pred = pred.max(1)[1].data.cpu().numpy()
                 np.save(pred_save_path, pred)
+                self.save_json(pred, data_dict, save_path)
+                
                 
 
             batch_time.update(time.time() - end)
@@ -437,6 +449,27 @@ class TgnetInferer(TesterBase):
     def collate_fn(batch):
         return batch
 
+    def save_json(self, pred, data_dict, save_path):
+        id = data_dict['id']
+        jaw = data_dict['jaw']
+
+        # 从分割语义还原回fdi
+        pred[pred >8 ] += 12
+        pred[(pred > 0) & (pred < 9)] += 10
+        if jaw == 'lower':
+            pred[pred != 0] += 20
+            
+        json_data = {}
+        json_data['id_patient'] = id
+        json_data['jaw'] = jaw
+        json_data['labels'] = pred.tolist()
+        
+        file_name = id + '_' + jaw + '.json'
+        with open(os.path.join(save_path, file_name), 'w', encoding='utf-8') as file:  
+            json.dump(json_data, file, ensure_ascii=False, indent=4)  
+            self.logger.info(f'{id} {jaw} inference result saved!')
+            
+        return
 @TESTERS.register_module()
 class ClsTester(TesterBase):
     def test(self):

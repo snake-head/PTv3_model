@@ -130,6 +130,7 @@ def _distributed_worker(
     assert num_gpus_per_machine <= torch.cuda.device_count()
     logger = logging.getLogger(__name__)
     logger.error(f'local rank,{local_rank}')
+    # local_rank += 1
     torch.cuda.set_device(local_rank)
 
     # synchronize is needed here to prevent a possible timeout after calling init_process_group

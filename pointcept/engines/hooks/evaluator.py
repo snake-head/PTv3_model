@@ -124,7 +124,7 @@ class TgnetEvaluatorFPS(HookBase):
                 loss_mask = output_dict['loss_mask']
             pred = output_seg.max(1)[1]
             segment = input_dict["segment"]
-            offset_vector = input_dict['offset_vector']
+            # offset_vector = input_dict['offset_vector']
             if "origin_coord" in input_dict.keys():
                 idx, _ = pointops.knn_query(
                     1,
