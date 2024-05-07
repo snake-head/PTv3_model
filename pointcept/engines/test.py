@@ -28,6 +28,7 @@ from pointcept.utils.misc import (
 )
 from pointcept.models.ptv3_tgnet import PTv3Tgnet
 import json
+from sklearn.neighbors import KNeighborsClassifier  
 
 TESTERS = Registry("testers")
 
@@ -362,6 +363,8 @@ class TgnetInferer(TesterBase):
 
         # save_path = os.path.join(self.cfg.save_path, "result_infer")
         save_path = os.path.join(self.cfg.outputpath, "result_infer")
+        if self.cfg.knn:
+            save_path += '_knn'
         make_dirs(save_path)
 
         comm.synchronize()
@@ -385,6 +388,8 @@ class TgnetInferer(TesterBase):
             else:
                 print(data_dict.keys())
                 pred = torch.zeros((data_dict['coord'].shape[0], self.cfg.data.num_classes)).cuda()
+                selected_indices = None
+                self.knned = False
                 for i in range(len(fragment_list)):
                     fragment_batch_size = 1
                     s_i, e_i = i * fragment_batch_size, min(
@@ -416,7 +421,50 @@ class TgnetInferer(TesterBase):
                             batch_num=len(fragment_list),
                         )
                     )
-                pred = pred.max(1)[1].data.cpu().numpy()
+                    # 记录已知标签的索引
+                    if selected_indices is None:
+                        selected_indices = np.array([]) 
+                    bs = 0
+                    for be in input_dict["offset"]: 
+                        print('here3',idx_part[bs:be])
+                        selected_indices = np.concatenate((selected_indices,idx_part[bs:be].cpu().numpy()))
+                        print('here2', selected_indices.shape,selected_indices)
+                        bs = be
+                    print('here1', selected_indices.shape,selected_indices)
+                    # 如果使用knn分类，那么在推理完约十分之一后改用knn
+                    if self.cfg.knn == True and i > (len(fragment_list)/10):
+                        self.knned = True
+                        pred = pred.max(1)[1]
+                        
+                        # 创建KNN分类器  
+                        knn = KNeighborsClassifier(n_neighbors=5)  # 假设选择K=3 
+                        bs = 0
+                        
+                        selected_indices = np.unique(selected_indices).astype(int)
+                        print('here', selected_indices.shape,selected_indices)
+                        # 拟合模型  
+                        print('here2', pred[selected_indices].cpu().numpy())
+                        knn.fit(data_dict['coord'][selected_indices], pred[selected_indices].cpu().numpy().astype(int))  
+                        
+                        # 找到未分配label的点  
+                        mask = np.ones(pred.shape, dtype=bool)
+                        mask[selected_indices] = False 
+                        
+                        unlabeled_points = np.delete(data_dict['coord'], selected_indices, axis=0) 
+                        # 未分配label的点  
+                        
+                        # 对未分配label的点进行预测  
+                        predicted_labels = knn.predict(unlabeled_points)  
+                        print('here5', predicted_labels.shape,data_dict['coord'].shape, pred.shape)
+                        
+                        mask = np.ones(pred.shape, dtype=bool)
+                        mask[selected_indices] = False  
+                        pred[mask] = torch.from_numpy(predicted_labels).cuda()
+                        break
+                if self.knned:
+                    pred = pred.data.cpu().numpy()
+                else:
+                    pred = pred.max(1)[1].data.cpu().numpy()
                 np.save(pred_save_path, pred)
                 self.save_json(pred, data_dict, save_path)
                 

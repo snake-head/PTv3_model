@@ -22,15 +22,21 @@ def main():
     # 非test模式
     print('inputpath:', args.inputpath)
     print('outputpath:', args.outputpath)
+    print('knn:',args.knn)
+    # 配置推理类
     cfg.test.type = ('TgnetInferer')
     cfg.data.test['infer_mode'] = True
     cfg.data.test.test_mode = True
+    # 配置输入输出路径
     cfg.inputpath = args.inputpath
     cfg.outputpath = args.outputpath
     cfg.data_root = args.inputpath
+    # 配置数据集路径
     cfg.data.train.data_root = cfg.data_root
     cfg.data.val.data_root = cfg.data_root
     cfg.data.test.data_root = cfg.data_root
+    # 配置是否使用knn
+    cfg.knn = args.knn
     
     
     launch(

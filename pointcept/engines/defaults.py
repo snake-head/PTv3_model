@@ -110,6 +110,9 @@ def default_argument_parser(epilog=None):
     parser.add_argument(
         "--outputpath",  type=str, help="output path when infer", required=False
     )
+    parser.add_argument(
+        "--knn",  type=bool, help="if use knn", required=False, default=False
+    )
     return parser
 
 

@@ -13,8 +13,9 @@ GPU=None
 
 INPUT_PATH=None
 OUTPUT_PATH=None
+KNN=false
 
-while getopts "p:d:c:n:w:g:i:o:" opt; do
+while getopts "p:d:c:n:w:g:i:o:k:" opt; do
   case $opt in
     p)
       PYTHON=$OPTARG
@@ -36,10 +37,12 @@ while getopts "p:d:c:n:w:g:i:o:" opt; do
       ;;
     i)
       INPUT_PATH=$OPTARG
-
       ;;
     o)
       OUTPUT_PATH=$OPTARG
+      ;;
+    k)
+      KNN=$OPTARG
       ;;
     \?)
       echo "Invalid option: -$OPTARG"
@@ -85,4 +88,5 @@ $PYTHON -u tools/$TEST_CODE \
   --num-gpus "$GPU" \
   --options save_path="$EXP_DIR" weight="${MODEL_DIR}"/"${WEIGHT}".pth\
   --inputpath $INPUT_PATH\
-  --outputpath $OUTPUT_PATH
+  --outputpath $OUTPUT_PATH\
+  --knn $KNN
