@@ -223,39 +223,6 @@ class TgnetSegmentor(nn.Module):
                 loss_mask = self.get_loss_mask(single_tooth_point_output, mask_logits=mask_logits)
                 # 注意，目前在seg1上更新
                 mask_segment_logits = self.get_mask_segment_logits(single_tooth_point_output, seg_logits=seg_logits, mask_logits=mask_logits)
-            
-            # 保存一个测试数据 
-            # if point['grid_coord'].get_device() == 0:
-            #     data = {}
-            #     data['jaw'] = point['jaw']
-            #     data['id'] = point['id']
-            #     all_data = {}
-            #     all_data['istrain'] = self.training
-            #     all_data['grid_coord'] = point['grid_coord']
-            #     all_data['offset'] = offset_logits
-            #     all_data['segment'] = point['segment']
-            #     all_data['normal'] = point['normal']
-            #     if not self.training:
-            #         all_data['cls_segment_logits'] = cls_segment_logits
-            #     all_data['batch_offset'] = point['offset']
-            #     all_data['coord'] = point['coord']
-            #     all_data['batch'] = point['batch']
-            #     all_data['seg_logits'] = seg_logits
-            #     all_data['mask_segment_logits'] = mask_segment_logits
-                
-            #     single_data = {}
-            #     single_data['single_grid_coord'] = single_tooth_point_output['grid_coord']
-            #     single_data['single_batch'] = single_tooth_point_output['batch']
-                
-            #     single_data['mask_logits'] = mask_logits
-            #     single_data['mask_target'] = single_tooth_point_output['mask_target']
-            #     single_data['single_label'] = single_tooth_point_output['label']
-            #     single_data['single_mask_all_to_crop'] = single_tooth_point_output['mask_all_to_crop']
-            #     single_data['single_segment'] = single_tooth_point_output['segment']
-            #     data['all'] = all_data 
-            #     data['single'] = single_data
-                
-            #     torch.save(data,'full_crop_data.pth')
         else:
             single_tooth_point_output = self.second_module(single_tooth_point)
             mask_logits = self.mask_head(single_tooth_point_output.feat)
@@ -265,7 +232,39 @@ class TgnetSegmentor(nn.Module):
             mask_segment_logits = self.get_mask_segment_logits(single_tooth_point_output, seg_logits=seg_logits, mask_logits=mask_logits)
 
         
-        
+        # 保存一个测试数据 
+        # if point['grid_coord'].get_device() == 0:
+        if False:
+            data = {}
+            data['jaw'] = point['jaw']
+            data['id'] = point['id']
+            all_data = {}
+            all_data['istrain'] = self.training
+            all_data['grid_coord'] = point['grid_coord']
+            all_data['offset'] = offset_logits
+            # all_data['segment'] = point['segment']
+            all_data['normal'] = point['normal']
+            if not self.training:
+                all_data['cls_segment_logits'] = cls_segment_logits
+            all_data['batch_offset'] = point['offset']
+            all_data['coord'] = point['coord']
+            all_data['batch'] = point['batch']
+            all_data['seg_logits'] = seg_logits
+            all_data['mask_segment_logits'] = mask_segment_logits
+            
+            single_data = {}
+            # single_data['single_grid_coord'] = single_tooth_point_output['grid_coord']
+            # single_data['single_batch'] = single_tooth_point_output['batch']
+            
+            # single_data['mask_logits'] = mask_logits
+            # single_data['mask_target'] = single_tooth_point_output['mask_target']
+            # single_data['single_label'] = single_tooth_point_output['label']
+            # single_data['single_mask_all_to_crop'] = single_tooth_point_output['mask_all_to_crop']
+            # single_data['single_segment'] = single_tooth_point_output['segment']
+            data['all'] = all_data 
+            data['single'] = single_data
+            
+            torch.save(data,'full_crop_data.pth')
             
             
 

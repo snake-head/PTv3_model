@@ -71,6 +71,7 @@ sh scripts/train.sh -p python -g 3 -d tgnet -c semseg-pt-v3m1-0-tgnet-fps-56 -n 
 ```
 
 ## 训练tgnet-good
+
 更加完善的fps模型
 聚类从牙中选
 单牙feat更新
@@ -79,8 +80,26 @@ sh scripts/train.sh -p python -g 3 -d tgnet -c semseg-pt-v3m1-0-tgnet-fps-56 -n 
 
 ```sh
 sh scripts/train.sh -p python -g 3 -d tgnet -c semseg-pt-v3m1-0-tgnet-fps-good -n semseg-pt-v3m1-0-tgnet-fps-good
+92.17%	94.90%	96.21%
+```
+## 训练tgnet-mask1
+
+mask更新牙齿而不是牙龈
+
+```sh
+sh scripts/train.sh -p python -g 4 -d tgnet -c semseg-pt-v3m1-0-tgnet-fps-mask1 -n semseg-pt-v3m1-0-tgnet-fps-mask1
+
 ```
 
+
+## 训练tgnet-good-big
+
+grid_size 0.01
+
+```sh
+sh scripts/train.sh -p python -g 4 -d tgnet -c semseg-pt-v3m1-0-tgnet-fps-good-big -n semseg-pt-v3m1-0-tgnet-fps-good-big
+
+```
 ## 恢复训练
 
 ```sh
@@ -110,7 +129,8 @@ sh scripts/test.sh -p python -g 1 -d tgnet -n semseg-pt-v3m1-0-tgnet-fps-full-te
 sh scripts/infer.sh -p ${INTERPRETER_PATH} -g ${NUM_GPU} -d ${DATASET_NAME} -n ${EXP_NAME} -w ${CHECKPOINT_NAME}
 sh scripts/infer.sh -p python -g 1 -d tgnet -n semseg-pt-v3m1-0-tgnet-fps-full-test -w model_best -i 'data/tgnet_fulldataset_whole_norm' -o 'data/result_of_test'
 
-sh scripts/infer.sh -p python -g 1 -d tgnet -n semseg-pt-v3m1-0-tgnet-fps-good -w model_best -i 'data/tgnet_resize_dataset' -o 'data/result_of_resize_dataset'
+sh scripts/infer.sh -p python -g 1 -d tgnet -n semseg-pt-v3m1-0-tgnet-fps-good -w model_best -i 'data/tgnet_resize_dataset' -o 'data/result_of_resize_dataset' -k true
+92.17%	94.90%	96.21%
 ```
 
 # 设计网络

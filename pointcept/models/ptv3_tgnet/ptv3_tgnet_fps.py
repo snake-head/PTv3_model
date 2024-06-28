@@ -779,3 +779,5 @@ class PTv3Tgnet(PointModule):
     def forward(self, data_dict):
         output = self.fps_module(data_dict)
         return output
+    
+    

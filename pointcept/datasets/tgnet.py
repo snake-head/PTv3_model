@@ -35,6 +35,7 @@ class TgnetDataset(Dataset):
         print('hhhhhhhhhhh')
         super(TgnetDataset, self).__init__()
         self.data_root = data_root
+        print('data_root',self.data_root)
         self.split = split
         self.transform = Compose(transform)
         self.loop = (

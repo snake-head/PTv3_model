@@ -390,6 +390,8 @@ class TgnetInferer(TesterBase):
                 pred = torch.zeros((data_dict['coord'].shape[0], self.cfg.data.num_classes)).cuda()
                 selected_indices = None
                 self.knned = False
+                selected_num = []
+                knn_data = {}
                 for i in range(len(fragment_list)):
                     fragment_batch_size = 1
                     s_i, e_i = i * fragment_batch_size, min(
@@ -432,7 +434,12 @@ class TgnetInferer(TesterBase):
                         bs = be
                     print('here1', selected_indices.shape,selected_indices)
                     # 如果使用knn分类，那么在推理完约十分之一后改用knn
-                    if self.cfg.knn == True and i > (len(fragment_list)/10):
+                    # if self.cfg.knn == True:
+                    #     selected_indices_now = np.unique(selected_indices).astype(int)
+                    #     selected_num.append(len(selected_indices_now))
+                        
+                        
+                    if self.cfg.knn == True and i > (len(fragment_list)/7):
                         self.knned = True
                         pred = pred.max(1)[1]
                         
@@ -467,6 +474,14 @@ class TgnetInferer(TesterBase):
                     pred = pred.max(1)[1].data.cpu().numpy()
                 np.save(pred_save_path, pred)
                 self.save_json(pred, data_dict, save_path)
+                
+                # 获取PyTorch缓存的显存  
+                cached = torch.cuda.memory_cached()  
+                print(f"缓存显存占用: {cached / 1024**3:.2f} GB")  
+                allocated = torch.cuda.memory_allocated()  
+                print(f"显存占用：{allocated / 1024**3:.2f} GB")  
+                # knn_data['selected_num'] = selected_num
+                # torch.save(knn_data,'knn_data.pth')
                 
                 
 

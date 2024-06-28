@@ -1,0 +1,1703 @@
+[2024-05-27 23:43:41,186 INFO test.py line 43 675286] => Loading config ...
+[2024-05-27 23:43:41,186 INFO test.py line 50 675286] => Building model ...
+[2024-05-27 23:43:41,976 INFO default.py line 154 675286] tgnetsegmentor build完毕
+[2024-05-27 23:43:41,980 INFO ptv3_tgnet_fps.py line 748 675286] Num params: 92334805
+[2024-05-27 23:43:43,743 INFO ptv3_tgnet_fps.py line 756 675286] Loading weight at: exp/tgnet/semseg-pt-v3m1-0-tgnet-fps-good/model/model_best.pth
+[2024-05-27 23:43:46,305 INFO ptv3_tgnet_fps.py line 768 675286] => Loaded weight 'exp/tgnet/semseg-pt-v3m1-0-tgnet-fps-good/model/model_best.pth' (epoch 22)
+[2024-05-27 23:43:46,313 INFO ptv3_tgnet_fps.py line 739 675286] 模块结构: TgnetSegmentor(
+  (seg_head): Linear(in_features=64, out_features=17, bias=True)
+  (offset_head): Sequential(
+    (0): Linear(in_features=64, out_features=16, bias=True)
+    (1): Linear(in_features=16, out_features=3, bias=True)
+  )
+  (mask_head): Sequential(
+    (0): Linear(in_features=64, out_features=1, bias=True)
+  )
+  (first_module): PTV3TgnetBackBone(
+    (embedding): Embedding(
+      (stem): PointSequential(
+        (conv): SubMConv3d(6, 32, kernel_size=[5, 5, 5], stride=[1, 1, 1], padding=[1, 1, 1], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.Native)
+        (norm): BatchNorm1d(32, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        (act): GELU(approximate='none')
+      )
+    )
+    (enc): PointSequential(
+      (enc0): PointSequential(
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(32, 32, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=32, out_features=32, bias=True)
+            (2): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=32, out_features=96, bias=True)
+            (proj): Linear(in_features=32, out_features=32, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=32, out_features=128, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=128, out_features=32, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): Identity()
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(32, 32, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=32, out_features=32, bias=True)
+            (2): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=32, out_features=96, bias=True)
+            (proj): Linear(in_features=32, out_features=32, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=32, out_features=128, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=128, out_features=32, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.023)
+          )
+        )
+      )
+      (enc1): PointSequential(
+        (down): SerializedPooling(
+          (proj): Linear(in_features=32, out_features=64, bias=True)
+          (norm): PointSequential(
+            (0): BatchNorm1d(64, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          )
+          (act): PointSequential(
+            (0): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(64, 64, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=64, out_features=64, bias=True)
+            (2): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=64, out_features=192, bias=True)
+            (proj): Linear(in_features=64, out_features=64, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=64, out_features=256, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=256, out_features=64, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.046)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(64, 64, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=64, out_features=64, bias=True)
+            (2): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=64, out_features=192, bias=True)
+            (proj): Linear(in_features=64, out_features=64, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=64, out_features=256, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=256, out_features=64, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.069)
+          )
+        )
+      )
+      (enc2): PointSequential(
+        (down): SerializedPooling(
+          (proj): Linear(in_features=64, out_features=128, bias=True)
+          (norm): PointSequential(
+            (0): BatchNorm1d(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          )
+          (act): PointSequential(
+            (0): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=128, out_features=128, bias=True)
+            (2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=128, out_features=384, bias=True)
+            (proj): Linear(in_features=128, out_features=128, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=128, out_features=512, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=512, out_features=128, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.092)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=128, out_features=128, bias=True)
+            (2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=128, out_features=384, bias=True)
+            (proj): Linear(in_features=128, out_features=128, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=128, out_features=512, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=512, out_features=128, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.115)
+          )
+        )
+      )
+      (enc3): PointSequential(
+        (down): SerializedPooling(
+          (proj): Linear(in_features=128, out_features=256, bias=True)
+          (norm): PointSequential(
+            (0): BatchNorm1d(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          )
+          (act): PointSequential(
+            (0): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.138)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.162)
+          )
+        )
+        (block2): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.185)
+          )
+        )
+        (block3): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.208)
+          )
+        )
+        (block4): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.231)
+          )
+        )
+        (block5): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.254)
+          )
+        )
+      )
+      (enc4): PointSequential(
+        (down): SerializedPooling(
+          (proj): Linear(in_features=256, out_features=512, bias=True)
+          (norm): PointSequential(
+            (0): BatchNorm1d(512, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          )
+          (act): PointSequential(
+            (0): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(512, 512, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=512, out_features=512, bias=True)
+            (2): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=512, out_features=1536, bias=True)
+            (proj): Linear(in_features=512, out_features=512, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=512, out_features=2048, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=2048, out_features=512, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.277)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(512, 512, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=512, out_features=512, bias=True)
+            (2): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=512, out_features=1536, bias=True)
+            (proj): Linear(in_features=512, out_features=512, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=512, out_features=2048, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=2048, out_features=512, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.300)
+          )
+        )
+      )
+    )
+    (dec): PointSequential(
+      (dec3): PointSequential(
+        (up): SerializedUnpooling(
+          (proj): PointSequential(
+            (0): Linear(in_features=512, out_features=256, bias=True)
+            (1): BatchNorm1d(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+          (proj_skip): PointSequential(
+            (0): Linear(in_features=256, out_features=256, bias=True)
+            (1): BatchNorm1d(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.300)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.257)
+          )
+        )
+      )
+      (dec2): PointSequential(
+        (up): SerializedUnpooling(
+          (proj): PointSequential(
+            (0): Linear(in_features=256, out_features=128, bias=True)
+            (1): BatchNorm1d(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+          (proj_skip): PointSequential(
+            (0): Linear(in_features=128, out_features=128, bias=True)
+            (1): BatchNorm1d(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=128, out_features=128, bias=True)
+            (2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=128, out_features=384, bias=True)
+            (proj): Linear(in_features=128, out_features=128, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=128, out_features=512, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=512, out_features=128, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.214)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=128, out_features=128, bias=True)
+            (2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=128, out_features=384, bias=True)
+            (proj): Linear(in_features=128, out_features=128, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=128, out_features=512, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=512, out_features=128, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.171)
+          )
+        )
+      )
+      (dec1): PointSequential(
+        (up): SerializedUnpooling(
+          (proj): PointSequential(
+            (0): Linear(in_features=128, out_features=64, bias=True)
+            (1): BatchNorm1d(64, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+          (proj_skip): PointSequential(
+            (0): Linear(in_features=64, out_features=64, bias=True)
+            (1): BatchNorm1d(64, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(64, 64, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=64, out_features=64, bias=True)
+            (2): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=64, out_features=192, bias=True)
+            (proj): Linear(in_features=64, out_features=64, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=64, out_features=256, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=256, out_features=64, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.129)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(64, 64, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=64, out_features=64, bias=True)
+            (2): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=64, out_features=192, bias=True)
+            (proj): Linear(in_features=64, out_features=64, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=64, out_features=256, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=256, out_features=64, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.086)
+          )
+        )
+      )
+      (dec0): PointSequential(
+        (up): SerializedUnpooling(
+          (proj): PointSequential(
+            (0): Linear(in_features=64, out_features=64, bias=True)
+            (1): BatchNorm1d(64, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+          (proj_skip): PointSequential(
+            (0): Linear(in_features=32, out_features=64, bias=True)
+            (1): BatchNorm1d(64, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(64, 64, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=64, out_features=64, bias=True)
+            (2): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=64, out_features=192, bias=True)
+            (proj): Linear(in_features=64, out_features=64, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=64, out_features=256, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=256, out_features=64, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.043)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(64, 64, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=64, out_features=64, bias=True)
+            (2): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=64, out_features=192, bias=True)
+            (proj): Linear(in_features=64, out_features=64, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=64, out_features=256, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=256, out_features=64, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): Identity()
+          )
+        )
+      )
+    )
+  )
+  (second_module): PTV3TgnetBackBone(
+    (embedding): Embedding(
+      (stem): PointSequential(
+        (conv): SubMConv3d(6, 32, kernel_size=[5, 5, 5], stride=[1, 1, 1], padding=[1, 1, 1], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.Native)
+        (norm): BatchNorm1d(32, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        (act): GELU(approximate='none')
+      )
+    )
+    (enc): PointSequential(
+      (enc0): PointSequential(
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(32, 32, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=32, out_features=32, bias=True)
+            (2): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=32, out_features=96, bias=True)
+            (proj): Linear(in_features=32, out_features=32, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=32, out_features=128, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=128, out_features=32, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): Identity()
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(32, 32, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=32, out_features=32, bias=True)
+            (2): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=32, out_features=96, bias=True)
+            (proj): Linear(in_features=32, out_features=32, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=32, out_features=128, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=128, out_features=32, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.023)
+          )
+        )
+      )
+      (enc1): PointSequential(
+        (down): SerializedPooling(
+          (proj): Linear(in_features=32, out_features=64, bias=True)
+          (norm): PointSequential(
+            (0): BatchNorm1d(64, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          )
+          (act): PointSequential(
+            (0): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(64, 64, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=64, out_features=64, bias=True)
+            (2): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=64, out_features=192, bias=True)
+            (proj): Linear(in_features=64, out_features=64, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=64, out_features=256, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=256, out_features=64, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.046)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(64, 64, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=64, out_features=64, bias=True)
+            (2): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=64, out_features=192, bias=True)
+            (proj): Linear(in_features=64, out_features=64, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=64, out_features=256, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=256, out_features=64, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.069)
+          )
+        )
+      )
+      (enc2): PointSequential(
+        (down): SerializedPooling(
+          (proj): Linear(in_features=64, out_features=128, bias=True)
+          (norm): PointSequential(
+            (0): BatchNorm1d(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          )
+          (act): PointSequential(
+            (0): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=128, out_features=128, bias=True)
+            (2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=128, out_features=384, bias=True)
+            (proj): Linear(in_features=128, out_features=128, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=128, out_features=512, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=512, out_features=128, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.092)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=128, out_features=128, bias=True)
+            (2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=128, out_features=384, bias=True)
+            (proj): Linear(in_features=128, out_features=128, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=128, out_features=512, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=512, out_features=128, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.115)
+          )
+        )
+      )
+      (enc3): PointSequential(
+        (down): SerializedPooling(
+          (proj): Linear(in_features=128, out_features=256, bias=True)
+          (norm): PointSequential(
+            (0): BatchNorm1d(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          )
+          (act): PointSequential(
+            (0): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.138)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.162)
+          )
+        )
+        (block2): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.185)
+          )
+        )
+        (block3): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.208)
+          )
+        )
+        (block4): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.231)
+          )
+        )
+        (block5): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.254)
+          )
+        )
+      )
+      (enc4): PointSequential(
+        (down): SerializedPooling(
+          (proj): Linear(in_features=256, out_features=512, bias=True)
+          (norm): PointSequential(
+            (0): BatchNorm1d(512, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          )
+          (act): PointSequential(
+            (0): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(512, 512, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=512, out_features=512, bias=True)
+            (2): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=512, out_features=1536, bias=True)
+            (proj): Linear(in_features=512, out_features=512, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=512, out_features=2048, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=2048, out_features=512, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.277)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(512, 512, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=512, out_features=512, bias=True)
+            (2): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=512, out_features=1536, bias=True)
+            (proj): Linear(in_features=512, out_features=512, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=512, out_features=2048, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=2048, out_features=512, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.300)
+          )
+        )
+      )
+    )
+    (dec): PointSequential(
+      (dec3): PointSequential(
+        (up): SerializedUnpooling(
+          (proj): PointSequential(
+            (0): Linear(in_features=512, out_features=256, bias=True)
+            (1): BatchNorm1d(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+          (proj_skip): PointSequential(
+            (0): Linear(in_features=256, out_features=256, bias=True)
+            (1): BatchNorm1d(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.300)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(256, 256, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=256, out_features=768, bias=True)
+            (proj): Linear(in_features=256, out_features=256, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=256, out_features=1024, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=1024, out_features=256, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.257)
+          )
+        )
+      )
+      (dec2): PointSequential(
+        (up): SerializedUnpooling(
+          (proj): PointSequential(
+            (0): Linear(in_features=256, out_features=128, bias=True)
+            (1): BatchNorm1d(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+          (proj_skip): PointSequential(
+            (0): Linear(in_features=128, out_features=128, bias=True)
+            (1): BatchNorm1d(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=128, out_features=128, bias=True)
+            (2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=128, out_features=384, bias=True)
+            (proj): Linear(in_features=128, out_features=128, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=128, out_features=512, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=512, out_features=128, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.214)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=128, out_features=128, bias=True)
+            (2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=128, out_features=384, bias=True)
+            (proj): Linear(in_features=128, out_features=128, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=128, out_features=512, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=512, out_features=128, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.171)
+          )
+        )
+      )
+      (dec1): PointSequential(
+        (up): SerializedUnpooling(
+          (proj): PointSequential(
+            (0): Linear(in_features=128, out_features=64, bias=True)
+            (1): BatchNorm1d(64, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+          (proj_skip): PointSequential(
+            (0): Linear(in_features=64, out_features=64, bias=True)
+            (1): BatchNorm1d(64, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(64, 64, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=64, out_features=64, bias=True)
+            (2): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=64, out_features=192, bias=True)
+            (proj): Linear(in_features=64, out_features=64, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=64, out_features=256, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=256, out_features=64, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.129)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(64, 64, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=64, out_features=64, bias=True)
+            (2): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=64, out_features=192, bias=True)
+            (proj): Linear(in_features=64, out_features=64, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=64, out_features=256, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=256, out_features=64, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.086)
+          )
+        )
+      )
+      (dec0): PointSequential(
+        (up): SerializedUnpooling(
+          (proj): PointSequential(
+            (0): Linear(in_features=64, out_features=64, bias=True)
+            (1): BatchNorm1d(64, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+          (proj_skip): PointSequential(
+            (0): Linear(in_features=32, out_features=64, bias=True)
+            (1): BatchNorm1d(64, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (2): GELU(approximate='none')
+          )
+        )
+        (block0): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(64, 64, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=64, out_features=64, bias=True)
+            (2): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=64, out_features=192, bias=True)
+            (proj): Linear(in_features=64, out_features=64, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=64, out_features=256, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=256, out_features=64, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): DropPath(drop_prob=0.043)
+          )
+        )
+        (block1): Block(
+          (cpe): PointSequential(
+            (0): SubMConv3d(64, 64, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+            (1): Linear(in_features=64, out_features=64, bias=True)
+            (2): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (norm1): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (attn): SerializedAttention(
+            (qkv): Linear(in_features=64, out_features=192, bias=True)
+            (proj): Linear(in_features=64, out_features=64, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (norm2): PointSequential(
+            (0): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          )
+          (mlp): PointSequential(
+            (0): MLP(
+              (fc1): Linear(in_features=64, out_features=256, bias=True)
+              (act): GELU(approximate='none')
+              (fc2): Linear(in_features=256, out_features=64, bias=True)
+              (drop): Dropout(p=0.0, inplace=False)
+            )
+          )
+          (drop_path): PointSequential(
+            (0): Identity()
+          )
+        )
+      )
+    )
+  )
+  (criteria_offset): MSELoss()
+  (criteria_dir): CosineSimilarity()
+)
+[2024-05-27 23:43:46,314 INFO test.py line 56 675286] => Building test dataset & dataloader ...
+[2024-05-27 23:43:46,328 INFO tgnet.py line 66 675286] Totally 2 x 1 samples in test set.
+[2024-05-27 23:43:46,329 INFO test.py line 356 675286] >>>>>>>>>>>>>>>> Start Inferring >>>>>>>>>>>>>>>>
+[2024-05-27 23:43:49,135 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:49,190 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,13,点数,4165,应有,4196
+[2024-05-27 23:43:49,204 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:49,206 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:49,219 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:49,302 INFO test.py line 417 675286] Test: 1/2-test01_lower, Batch: 0/73
+[2024-05-27 23:43:49,372 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:49,416 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,13,点数,4155,应有,4191
+[2024-05-27 23:43:49,429 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:49,430 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:49,443 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:49,523 INFO test.py line 417 675286] Test: 1/2-test01_lower, Batch: 1/73
+[2024-05-27 23:43:49,592 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:49,635 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,13,点数,4142,应有,4177
+[2024-05-27 23:43:49,648 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:49,649 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:49,662 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:49,742 INFO test.py line 417 675286] Test: 1/2-test01_lower, Batch: 2/73
+[2024-05-27 23:43:49,812 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:49,855 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,13,点数,4164,应有,4204
+[2024-05-27 23:43:49,868 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:49,869 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:49,882 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:49,960 INFO test.py line 417 675286] Test: 1/2-test01_lower, Batch: 3/73
+[2024-05-27 23:43:50,031 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:50,073 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,13,点数,4176,应有,4207
+[2024-05-27 23:43:50,086 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:50,087 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:50,100 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:50,180 INFO test.py line 417 675286] Test: 1/2-test01_lower, Batch: 4/73
+[2024-05-27 23:43:50,248 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:50,292 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,13,点数,4157,应有,4189
+[2024-05-27 23:43:50,304 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:50,306 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:50,318 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:50,399 INFO test.py line 417 675286] Test: 1/2-test01_lower, Batch: 5/73
+[2024-05-27 23:43:50,469 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:50,518 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,13,点数,4159,应有,4188
+[2024-05-27 23:43:50,537 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:50,539 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:50,557 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:50,643 INFO test.py line 417 675286] Test: 1/2-test01_lower, Batch: 6/73
+[2024-05-27 23:43:50,712 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:50,757 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,13,点数,4163,应有,4192
+[2024-05-27 23:43:50,769 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:50,770 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:50,783 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:50,862 INFO test.py line 417 675286] Test: 1/2-test01_lower, Batch: 7/73
+[2024-05-27 23:43:50,931 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:50,975 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,13,点数,4173,应有,4213
+[2024-05-27 23:43:50,987 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:50,989 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:51,001 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:51,082 INFO test.py line 417 675286] Test: 1/2-test01_lower, Batch: 8/73
+[2024-05-27 23:43:51,151 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:51,194 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,13,点数,4168,应有,4203
+[2024-05-27 23:43:51,207 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:51,208 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:51,220 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:51,299 INFO test.py line 417 675286] Test: 1/2-test01_lower, Batch: 9/73
+[2024-05-27 23:43:51,369 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:51,411 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,13,点数,4178,应有,4209
+[2024-05-27 23:43:51,425 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:51,427 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:51,439 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:51,520 INFO test.py line 417 675286] Test: 1/2-test01_lower, Batch: 10/73
+[2024-05-27 23:43:51,590 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:51,635 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,13,点数,4135,应有,4174
+[2024-05-27 23:43:51,647 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:51,648 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:51,661 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:51,741 INFO test.py line 417 675286] Test: 1/2-test01_lower, Batch: 11/73
+[2024-05-27 23:43:52,528 INFO test.py line 533 675286] test01 lower inference result saved!
+[2024-05-27 23:43:52,558 INFO test.py line 489 675286] Test: test01_lower [1/2]-106110 Batch 4.614 (4.614) 
+[2024-05-27 23:43:52,632 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:52,701 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,14,点数,5413,应有,5472
+[2024-05-27 23:43:52,714 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:52,716 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:52,728 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:52,813 INFO test.py line 417 675286] Test: 2/2-test01_upper, Batch: 0/53
+[2024-05-27 23:43:52,882 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:52,949 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,14,点数,5402,应有,5474
+[2024-05-27 23:43:52,963 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:52,964 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:52,977 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:53,056 INFO test.py line 417 675286] Test: 2/2-test01_upper, Batch: 1/53
+[2024-05-27 23:43:53,123 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:53,188 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,14,点数,5416,应有,5471
+[2024-05-27 23:43:53,202 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:53,204 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:53,216 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:53,298 INFO test.py line 417 675286] Test: 2/2-test01_upper, Batch: 2/53
+[2024-05-27 23:43:53,366 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:53,432 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,14,点数,5407,应有,5475
+[2024-05-27 23:43:53,446 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:53,447 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:53,461 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:53,547 INFO test.py line 417 675286] Test: 2/2-test01_upper, Batch: 3/53
+[2024-05-27 23:43:53,615 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:53,682 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,14,点数,5423,应有,5482
+[2024-05-27 23:43:53,696 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:53,697 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:53,710 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:53,791 INFO test.py line 417 675286] Test: 2/2-test01_upper, Batch: 4/53
+[2024-05-27 23:43:53,857 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:53,923 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,14,点数,5408,应有,5477
+[2024-05-27 23:43:53,937 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:53,939 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:53,951 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:54,033 INFO test.py line 417 675286] Test: 2/2-test01_upper, Batch: 5/53
+[2024-05-27 23:43:54,100 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:54,166 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,14,点数,5409,应有,5476
+[2024-05-27 23:43:54,180 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:54,181 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:54,194 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:54,275 INFO test.py line 417 675286] Test: 2/2-test01_upper, Batch: 6/53
+[2024-05-27 23:43:54,342 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:54,409 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,14,点数,5399,应有,5478
+[2024-05-27 23:43:54,423 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:54,424 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:54,436 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:54,518 INFO test.py line 417 675286] Test: 2/2-test01_upper, Batch: 7/53
+[2024-05-27 23:43:54,585 INFO default.py line 740 675286] 聚类开始
+[2024-05-27 23:43:54,653 INFO default.py line 767 675286] clust on ,0,聚类数,12,应有,14,点数,5429,应有,5492
+[2024-05-27 23:43:54,667 INFO default.py line 791 675286] 聚类结束
+[2024-05-27 23:43:54,669 INFO default.py line 653 675286] 创建单牙
+[2024-05-27 23:43:54,681 INFO default.py line 687 675286] 单牙制作完成
+[2024-05-27 23:43:54,764 INFO test.py line 417 675286] Test: 2/2-test01_upper, Batch: 8/53
+[2024-05-27 23:43:55,522 INFO test.py line 533 675286] test01 upper inference result saved!
+[2024-05-27 23:43:55,551 INFO test.py line 489 675286] Test: test01_upper [2/2]-96951 Batch 2.993 (3.803) 
+[2024-05-27 23:43:55,600 INFO test.py line 503 675286] Syncing ...
+[2024-05-27 23:43:55,600 INFO test.py line 509 675286] <<<<<<<<<<<<<<<<< End Evaluation <<<<<<<<<<<<<<<<<
