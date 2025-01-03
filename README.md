@@ -10,7 +10,9 @@
 模型名：**semseg-pt-v3m1-0-tgnet-fps-good**
 
 代码路径：\\172.16.200.7\Data.MIVA\ZhuYichen\PTv3_model
+
 测试数据路径：\\172.16.200.7\Data.MIVA\ZhuYichen\PTv3_model\data\request_modeldata
+
 模型路径：\\172.16.200.7\Data.MIVA\ZhuYichen\semseg-pt-v3m1-0-tgnet-fps-good\model\model_best.pth
 
 ## 环境配置
